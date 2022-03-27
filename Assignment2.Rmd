@@ -1,0 +1,130 @@
+---
+title: "Assignment2"
+author: "Sushmita Roy"
+date: "03/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Part 1
+*Sushmita Roy*
+## ID-s4651723 
+
+
+<hr style="border:3px solid"> 
+# Assignment 2
+
+<hr style="border:3px solid">
+### Part 2
+
+```{r}
+library(tidyverse)
+library(skimr)
+Dataset <-read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-11-20/thanksgiving_meals.csv")
+```
+### 1
+```{r}
+install.packages("randomForest")
+knitr::kable(head(Dataset[,1:10],10))
+```
+
+### 2
+```{r}
+Data_new<-skim(Dataset)
+
+```
+### 3
+```{r}
+family_income <-fct_reorder(Dataset$family_income, Dataset$family_income, min)
+```
+### 4
+```{r}
+nrow(subset(Dataset, celebrate=='Yes'))
+```
+### 5
+```{r}
+knitr::kable(Dataset %>% group_by(main_dish) %>%  count(main_prep) %>% arrange(desc(n)) %>% head(n=10))
+```
+
+### 6
+```{r}
+Dataset %>% ggplot() +  aes(x = main_dish, fill = main_dish) +   geom_bar() + labs(x = "Main Dish", y = "Count", title = "Main dish served and method", subtitle = "Main Dish", caption = "main dish served with method",  fill = "Legend")
+```
+
+
+<p>Turkey is the highest served dish compared to other. It is served at almost all the restrurents</p>
+<br>
+
+### 7
+```{r}
+nrow(subset(Dataset, gravy=='Yes'))
+nrow(subset(Dataset, cranberry=='Canned' | cranberry=='Homemade'))
+
+```
+### 8 and 9
+
+```{r}
+knitr::kable(Dataset %>% group_by(celebrate) %>%  count(family_income) %>% arrange(desc(n)) %>% head(n=10))
+```
+```{r}
+Dataset %>% ggplot() +  aes(x = celebrate, fill =family_income) +   geom_bar() + labs(x = "celebrate", y = "Count", title = "Distribution W.R.T celebrate with income ranges", subtitle = "Celebrate", caption = "Distribution W.R.T. celebrate with income ranges",  fill = "Legend")
+```
+<p>Almost all the income group people are celebrating. This shows that there is hardly any difference of the income. All the people are maximizing their enjoyment</p>
+<br>
+
+### 10
+```{r}
+Dataset1<-Dataset %>% select(id, starts_with("side"),
+         starts_with("pie"),
+         starts_with("dessert")) %>%
+  select(-side15, -pie13, -dessert12) %>%
+  gather(type, value, -id) %>%
+  filter(!is.na(value),
+         !value %in% c("None", "Other (please specify)")) %>%
+  mutate(type = str_remove(type, "\\d+"))
+```
+<p>It shows the listing of three columns with three wild cards. for example start with pie, start with desert and others. </p>
+<br>
+
+### 11 and 12
+```{r}
+library(widyr)
+```
+<p>TIt shows the correlation between different variables such that final results are extracted based in the relationships</p>
+<br>
+
+
+```{r}
+Dataset1 %>% pairwise_cor(value, id, sort = TRUE)
+```
+<p>It shows the relationship and prepare the pair of variables so that relation between different variables can be developed.</p>
+<br>
+ 
+### Question 13
+
+```{r}
+#linear regression model
+Data_new <- do.call(data.frame, lapply(Data_new, function(x) {
+  replace(x, is.infinite(x) | is.na(x) | is.nan(x), 0)
+  })
+)
+#model1 
+relation <- lm(t(Data_new[3])~t(Data_new[5]),Data_new)
+summary(relation)
+
+#model2
+relation <- lm(t(Data_new[4])~t(Data_new[6]),Data_new)
+summary(relation)
+#model3
+relation <- lm(t(Data_new[3])~t(Data_new[5]),Data_new)
+summary(relation)
+
+```
+<p>There are various variables that are considered in the setting of the variables. All the variable inter relationship is developed. The main variable is the family income, its relationship with rest of the variables is developed </p>
+
+<p> The best suitable model is linear regression model is used for developing relationship between two or more variables </p>
+<br>
+
+
